@@ -28,7 +28,7 @@ public class WebCrawler {
 
     private final ExecutorService executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
     private final String outputFilePath = "output1.txt";
-    private final String robotsTxtPath = "/Users/lionelchew/Desktop/java-web-crawler/robots.txt";
+    private final String robotsTxtPath = "robots.txt";
 
     private final String seedURL;
 
@@ -67,7 +67,7 @@ public class WebCrawler {
                         crawl(url);
                         return null;
                     }));
-                } else {
+                } else if (url != null && !visitedUrl.contains(url) && url.startsWith(seedURL) && !robotRespector.isAllowed(agents, url)) {
                     System.out.println(url + " is DISALLOWED");
                 }
             }
