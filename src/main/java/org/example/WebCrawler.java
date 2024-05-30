@@ -1,13 +1,8 @@
 package org.example;
-
-
-import crawlercommons.robots.SimpleRobotRules;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import crawlercommons.robots.BaseRobotRules;
-import crawlercommons.robots.SimpleRobotRulesParser;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,7 +19,7 @@ public class WebCrawler {
     private final int THREAD_POOL_SIZE = 4;
     private final Queue<String> urlQueue = new ConcurrentLinkedQueue<>();
     private final Set<String> visitedUrl = ConcurrentHashMap.newKeySet();
-    private final List<String> keywords = Arrays.asList("Electric Vehicles", "Sustainable", "Renewable energy", "Elon Musk", "SUV", "Autopilot", "Tesla", "Model S", "Model 3", "Model X", "Gigafactory", "Battery", "Hat", "Logo", "Bins");
+    private final List<String> keywords = Arrays.asList("movies");
 
     private final ExecutorService executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
     private final String outputFilePath = "output1.txt";
@@ -38,7 +33,7 @@ public class WebCrawler {
 
         // Download Robots.txt on init
         try {
-            URL robotsTextUrl = new URL(seedURL + "/robots.txt");
+            URL robotsTextUrl = new URL(seedURL + "robots.txt");
             try (InputStream in = robotsTextUrl.openStream()) {
                 Files.copy(in, Path.of(robotsTxtPath), StandardCopyOption.REPLACE_EXISTING);
                 System.out.println("robots.txt downloaded successfully.");
@@ -86,16 +81,14 @@ public class WebCrawler {
             Document doc = Jsoup.connect(url).get();
             String pageText = doc.body().text();
 
-            if (containsKeyword(pageText)) {
-                saveToOutputFile(url, pageText);
-                Elements linkTags = doc.select("a[href]");
-                linkTags.forEach(link -> {
-                    String href = link.attr("abs:href");
-                    if (!visitedUrl.contains(href)) {
-                        urlQueue.add(href);
-                    }
-                });
-            }
+            saveToOutputFile(url, pageText);
+            Elements linkTags = doc.select("a[href]");
+            linkTags.forEach(link -> {
+                String href = link.attr("abs:href");
+                if (!visitedUrl.contains(href)) {
+                    urlQueue.add(href);
+                }
+            });
 
         } catch (IOException e) {
             System.err.println("error processing URL: " + url + e.getMessage());
@@ -116,10 +109,4 @@ public class WebCrawler {
             throw new RuntimeException(e);
         }
     }
-
-
-
-
-
-
 }
